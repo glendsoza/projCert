@@ -1,0 +1,64 @@
+- hosts: "{{ env }}"
+  become: yes
+  tasks:
+  - name: add GPG key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: install docker
+    apt:
+      name: "{{item}}"
+      state: latest
+      update_cache: yes
+    loop:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Maker sure docker service is started
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: Delete content & directory
+    file:
+      state: absent
+      path: php_app
+
+  - name: Creates Fresh directory
+    file:
+      path: php_app
+      state: directory
+      mode: 0775      
+
+
+  - name: Creates directory
+    file:
+      path: php_app
+      state: directory
+      mode: 0775          
+
+  - name: Git Clone
+    ansible.builtin.git:
+      repo: "https://github.com/glendsoza/projCert.git"
+      dest: php_app
+
+  - name: "Stop any existing container"
+    shell: |
+      docker stop php_application
+      docker container rm php_application
+    ignore_errors: yes
+
+
+  - name: "Build the application"
+    shell: "cd php_app && docker build -t php_my_app:{{ build_tag }} ."
+
+  - name: "Run the application"
+    shell: "docker run --name php_application -p 8000:8000 -d php_my_app:{{ build_tag }}"
+
+
+
+
+
