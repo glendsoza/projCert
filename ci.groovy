@@ -5,7 +5,7 @@ pipeline {
             steps {
                 sh 'cd $WORKSPACE && rm -rf *'
                 sh 'git clone https://github.com/glendsoza/projCert.git'
-                    sh 'ansible-playbook --inventory /tmp/inv $WORKSPACE/cicd-pipeline-train-schedule-autodeploy/deploy-kube.yml --extra-vars "env=qa build=$BUILD_NUMBER"'
+                    sh 'ansible-playbook --inventory /tmp/inv $WORKSPACE/cicd-pipeline-train-schedule-autodeploy/deploy-kube.yml --extra-vars "env=test build_tag=$BUILD_NUMBER"'
                 }
                 post { 
                     always { 
